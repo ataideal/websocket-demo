@@ -12,7 +12,8 @@ defmodule WebsocketWeb.Endpoint do
 
   socket "/socket", WebsocketWeb.UserSocket,
     websocket: true,
-    longpoll: false
+    longpoll: false,
+    check_orign: false
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
