@@ -14,9 +14,10 @@ defmodule Websocket.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Websocket.PubSub},
       # Start the Endpoint (http/https)
-      WebsocketWeb.Endpoint
+      WebsocketWeb.Endpoint,
       # Start a worker by calling: Websocket.Worker.start_link(arg)
       # {Websocket.Worker, arg}
+      WebsocketWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

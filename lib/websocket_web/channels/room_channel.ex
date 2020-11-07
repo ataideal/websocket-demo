@@ -3,15 +3,26 @@ defmodule WebsocketWeb.RoomChannel do
 
   alias Websocket.Organization
   alias WebsocketWeb.PersonView
+  alias WebsocketWeb.Presence
 
   @impl true
   def join("room:lobby", payload, socket) do
     if authorized?(payload) do
+      send(self(), :after_join)
       people = Organization.list_people()
-      {:ok, PersonView.render("index.json", %{people: people}), socket}
+      {:ok, PersonView.render("index.json", %{people: people}),socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+
+  def handle_info(:after_join, socket) do
+    push(socket, "presence_state", Presence.list(socket))
+    {:ok, _} = Presence.track(socket, socket.assigns.user_id, %{
+      online_at: inspect(System.system_time(:second))
+    })
+
+    {:noreply, socket}
   end
 
   # Channels can be used in a request/response fashion
@@ -34,7 +45,7 @@ defmodule WebsocketWeb.RoomChannel do
     with {:ok, person} <- Organization.create_person(payload) do
       broadcast socket, "new_person", PersonView.render("person.json", %{person: person})
       {:noreply, socket}
-    else 
+    else
       _ -> {:reply, {:error, nil}, socket}
     end
   end
@@ -42,9 +53,9 @@ defmodule WebsocketWeb.RoomChannel do
   @impl true
   def handle_in("delete_person", %{"id" =>id }, socket) do
     with {:ok, person} <- Organization.delete_person(id) do
-      broadcast socket, "delete_person", PersonView.render("person.json", %{person: person})
+      broadcast socket, "delete_person", %{person_id: id}
       {:noreply, socket}
-    else 
+    else
       _ -> {:reply, {:error, nil}, socket}
     end
   end

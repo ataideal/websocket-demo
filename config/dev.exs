@@ -2,10 +2,10 @@ use Mix.Config
 
 # Configure your database
 config :websocket, Websocket.Repo,
-  username: "ataide",
-  password: "ataide",
+  username: "postgres",
+  password: "postgres",
   database: "websocket_dev",
-  hostname: "localhost",
+  hostname: "db",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
